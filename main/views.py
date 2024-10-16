@@ -29,6 +29,12 @@ def post_list(request):
 
 @login_required
 def post_detail(request, pk):
+    if request.method == "POST":
+        content = request.POST.get('content')
+        if content:
+            post = get_object_or_404(Post, id=pk)
+            comment = Comment.objects.create(post=post, author=request.user, content=content)
+            return redirect('post_detail', pk=pk)
     # Get the post by primary key (pk)
     post = get_object_or_404(Post, pk=pk)
 
@@ -79,19 +85,6 @@ def like_post(request, post_id):
         'like_count': post.likes.count(),
     })
 
-@login_required
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if request.method == "POST":
-        content = request.POST.get('content')
-        if content:
-            comment = Comment.objects.create(post=post, author=request.user, content=content)
-            return JsonResponse({
-                'author': comment.author.username,
-                'content': comment.content,
-                'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
-            })
-    return JsonResponse({'error': 'Comment could not be added.'}, status=400)
 
 def new_user(request):
     if request.method == 'POST':

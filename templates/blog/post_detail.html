@@ -54,7 +54,7 @@
 
             <!-- Add a New Comment -->
             <h4>Add a Comment</h4>
-            <form id="comment-form">
+            <form id="comment-form1" method="post">
                 {% csrf_token %}
                 <div class="mb-3">
                     <textarea class="form-control" name="content" rows="3" placeholder="Write your comment here..." required></textarea>
@@ -90,32 +90,6 @@
                 },
                 error: function() {
                     alert('An error occurred while liking the post.');
-                }
-            });
-        });
-
-        // AJAX for adding a comment
-        $('#comment-form').submit(function(event) {
-            //event.preventDefault(); // Prevent the default form submission
-
-            $.ajax({
-                url: "{% url 'add_comment' post.id %}",
-                type: "POST",
-                data: $(this).serialize(),
-                success: function(data) {
-                    // Append the new comment to the comment list
-                    $('#comment-list').append(
-                        '<li class="list-group-item">' +
-                        '<strong>' + data.author + ':</strong>' +
-                        '<p>' + data.content + '</p>' +
-                        '<small class="text-muted">' + data.created_at + '</small>' +
-                        '</li>'
-                    );
-                    // Clear the textarea
-                    $('textarea[name="content"]').val('');
-                },
-                error: function() {
-                    alert('An error occurred while adding your comment.');
                 }
             });
         });
