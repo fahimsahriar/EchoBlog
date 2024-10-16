@@ -1,15 +1,83 @@
 {% extends 'blog/base.html' %}
 
-{% block title %}
-    Welcome to My Blog
-{% endblock %}
+{% block title %}Welcome to My Blog{% endblock %}
 
 {% block content %}
-    <div class="jumbotron text-center mt-4">
-        <h1 class="display-4">Welcome to My Blog!</h1>
-        <p class="lead">This is a simple blog website where you can read, create, and engage with posts.</p>
-        <hr class="my-4">
-        <p>Start exploring by checking out the latest posts, or create your own!</p>
-        <a class="btn btn-primary btn-lg" href="{% url 'create_post' %}" role="button">Create a New Post</a>
-    </div>
+    {% if user.is_authenticated %}
+        <div class="container mt-4">
+            <!-- Welcome Message -->
+            <div class="jumbotron">
+                <h1 class="display-4">Welcome Back, {{ user.username }}!</h1>
+                <p class="lead">Explore the latest posts or create your own.</p>
+                <hr class="my-4">
+                <a class="btn btn-primary btn-lg" href="{% url 'create_post' %}" role="button">Create a New Post</a>
+            </div>
+
+            <!-- List of Blog Posts -->
+            <div class="row mt-4">
+                {% for post in posts %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                                </h5>
+                                <p class="card-text">
+                                    {{ post.content|truncatechars:100 }}
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">Posted on {{ post.created_at|date:"F j, Y" }} by 
+                                        <a href="{% url 'user_profile' post.author.username %}">{{ post.author.username }}</a>
+                                    </small>
+                                </p>
+                                <p class="card-text">
+                                    Likes: {{ post.likes.count }}
+                                </p>
+                                <a href="{% url 'post_detail' post.id %}" class="btn btn-primary">Read More</a>
+                            </div>
+
+                            {% if user == post.author %}
+                                <!-- Three-dot dropdown for editing and deleting post -->
+                                <div class="dropdown position-absolute top-0 end-0 m-2">
+                                    <button class="btn btn-link text-dark p-0" type="button" id="actionsDropdown{{ post.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots"></i> <!-- Three-dot icon -->
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ post.id }}">
+                                        <li><a class="dropdown-item" href="#">Edit</a></li>
+                                        <li><a class="dropdown-item" href="#">Delete</a></li>
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% if posts.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?page={{ posts.previous_page_number }}">previous</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+                    </span>
+            
+                    {% if posts.has_next %}
+                        <a href="?page={{ posts.next_page_number }}">next</a>
+                        <a href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    {% else %}
+        <div class="container mt-4">
+            <div class="jumbotron text-center">
+                <h1 class="display-4">Welcome to My Blog!</h1>
+                <p class="lead">Please <a href="{% url 'user_login' %}">Login</a> or <a href="{% url 'new_user' %}">Sign Up</a> to get started.</p>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -4,54 +4,68 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="mt-4">Blog Posts</h1>
+    <h1 class="mt-4 mb-4 text-center">Blog Posts</h1>
     
-    <div class="list-group">
-        {% for post in posts %}
-            <div class="list-group-item">
-                <!-- Post Title and Link to Detail View -->
-                <h3>
-                    <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
-                </h3>
-                
-                <!-- Post Excerpt or First 100 Characters -->
-                <p>{{ post.content|truncatechars:100 }}</p>
-                
-                <!-- Categories -->
-                <div>
-                    <strong>Categories:</strong>
-                    {% for category in post.categories.all %}
-                        <span class="badge bg-primary">{{ category.name }}</span>
-                    {% endfor %}
-                </div>
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            {% for post in posts %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <!-- Post Title and Link to Detail View -->
+                    <h3 class="card-title">
+                        <a href="{% url 'post_detail' post.id %}" class="text-dark text-decoration-none">
+                            {{ post.title }}
+                        </a>
+                    </h3>
 
-                <!-- Post Meta -->
-                <small class="text-muted">
-                    Posted on {{ post.created_at|date:"F j, Y" }} 
-                </small>
+                    <!-- Post Excerpt -->
+                    <p class="card-text">{{ post.content|truncatechars:100 }}</p>
+
+                    <!-- Categories -->
+                    <div class="mb-2">
+                        <strong>Categories:</strong>
+                        {% for category in post.categories.all %}
+                            <span class="badge bg-primary">{{ category.name }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Post Meta (Author and Date) -->
+                    <small class="text-muted">
+                        Published by {{ post.author.username }} on {{ post.created_at|date:"F j, Y" }}
+                    </small>
+                </div>
             </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
-    
-    <!-- Pagination (if using CBV with paginate_by) -->
-    <div class="pagination mt-4">
-        {% if is_paginated %}
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation">
             <ul class="pagination">
-                {% if page_obj.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
-                {% endif %}
-                
-                {% for page_num in paginator.page_range %}
-                    <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                {% if posts.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">&laquo; First</a>
                     </li>
-                {% endfor %}
-                
-                {% if page_obj.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item disabled">
+                    <span class="page-link">Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span>
+                </li>
+
+                {% if posts.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.paginator.num_pages }}">Last &raquo;</a>
+                    </li>
                 {% endif %}
             </ul>
-        {% endif %}
+        </nav>
     </div>
 </div>
 {% endblock %}

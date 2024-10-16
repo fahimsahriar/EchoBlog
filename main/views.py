@@ -5,14 +5,27 @@ from .forms import PostForm, SignUpForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 
 # Create your views here.
 def index(request):
-    return render(request, 'blog/home.html')
+    posts = Post.objects.order_by('-created_at')  # Get all posts, ordered by newest
 
+    paginator = Paginator(posts, 6)  # Show 25 contacts per page.
+    page_number = request.GET.get("page")
+    posts_obj = paginator.get_page(page_number)
+
+    return render(request, 'blog/home.html', {'posts': posts_obj})
+
+@login_required
 def post_list(request):
     posts = Post.objects.order_by('-created_at')  # Get all posts, ordered by newest
-    return render(request, 'blog/post_list.html', {'posts': posts})
+
+    paginator = Paginator(posts, 5)  # Show 25 contacts per page.
+    page_number = request.GET.get("page")
+    posts_obj = paginator.get_page(page_number)
+    return render(request, 'blog/post_list.html', {'posts': posts_obj})
 
 @login_required
 def post_detail(request, pk):
@@ -35,6 +48,7 @@ def post_detail(request, pk):
     
     return render(request, 'blog/post_detail.html', context)
 
+@login_required
 def create_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
@@ -48,6 +62,7 @@ def create_post(request):
         form = PostForm()
     return render(request, 'blog/post_form.html', {'form': form})
 
+@login_required
 def like_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if post.likes.filter(id=request.user.id).exists():
@@ -87,3 +102,23 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('user_login')  # Redirect to homepage after logout
+
+#User profile view
+def user_profile(request, username):
+    # Get the user by username
+    user = get_object_or_404(User, username=username)
+
+    # Get posts authored by the user
+    user_posts = Post.objects.filter(author=user).order_by('-created_at')
+
+    # Pagination (5 posts per page)
+    paginator = Paginator(user_posts, 5)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
+
+    context = {
+        'user_profile': user,
+        'posts': posts,
+    }
+
+    return render(request, 'blog/user_profile.html', context)

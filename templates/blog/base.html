@@ -8,6 +8,7 @@
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <!-- Additional styles can be added here -->
     <style>
@@ -27,6 +28,7 @@
         }
 
         footer {
+            margin-top: 30px;
             background-color: #343a40;
             color: white;
         }
@@ -51,7 +53,10 @@
                         <a class="nav-link" href="{% url 'create_post' %}">Create Post</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'post_list' %}">All posts</a>
+                        <a class="nav-link" href="{% url 'post_list' %}">All Posts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_profile' user.username %}">{{ user.username }}</a> <!-- Profile link -->
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'user_logout' %}">Logout</a>
@@ -79,7 +84,7 @@
             </div>
         </div>
     </main>
-
+    <div class='mb-100'></div>
     <!-- Footer -->
     <footer class="text-center py-3">
         <p>&copy; 2024 My Blog</p>

@@ -1,0 +1,85 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ user_profile.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- User Information -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>{{ user_profile.username }}'s Profile</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Email:</strong> {{ user_profile.email }}</p>
+            <p><strong>First Name:</strong> {{ user_profile.first_name }}</p>
+            <p><strong>Last Name:</strong> {{ user_profile.last_name }}</p>
+            
+            {% if user == user_profile %}
+                <!-- If logged-in user is the profile owner, show these options -->
+                <a href="#" class="btn btn-warning">Change Password</a>
+                <a href="#" class="btn btn-primary">Update Profile</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- User's Posts -->
+    <h3>{{ user_profile.username }}'s Posts</h3>
+
+    <div class="list-group">
+        {% for post in posts %}
+            <div class="list-group-item mb-3 position-relative">
+                <!-- Post Title linked to post detail view -->
+                <h4>
+                    <a href="{% url 'post_detail' post.id %}" class="text-decoration-none">{{ post.title }}</a>
+                </h4>
+                
+                <!-- Post Content Excerpt -->
+                <p>{{ post.content|truncatechars:100 }}</p>
+
+                <!-- Post Metadata (Date and Likes) -->
+                <small class="text-muted">
+                    Posted on {{ post.created_at|date:"F j, Y" }}
+                </small>
+                <br>
+                <small class="text-muted">
+                    Likes: {{ post.likes.count }} <!-- Display likes count -->
+                </small>
+
+                {% if user == user_profile %}
+                    <!-- Three-dot dropdown for editing and deleting post -->
+                    <div class="dropdown position-absolute top-0 end-0 m-2">
+                        <button class="btn btn-link text-dark p-0" type="button" id="actionsDropdown{{ post.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-three-dots"></i> <!-- Three-dot icon -->
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ post.id }}">
+                            <li><a class="dropdown-item" href="#">Edit</a></li>
+                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>{{ user_profile.username }} has not published any posts yet.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if posts.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ posts.previous_page_number }}">previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+            </span>
+    
+            {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}">next</a>
+                <a href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}
