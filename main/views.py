@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Post
 from .forms import PostForm, SignUpForm
@@ -63,13 +63,21 @@ def create_post(request):
     return render(request, 'blog/post_form.html', {'form': form})
 
 @login_required
-def like_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    if post.likes.filter(id=request.user.id).exists():
-        post.likes.remove(request.user)
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Toggle the user's like status
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)  # Unlike
+        liked = False
     else:
-        post.likes.add(request.user)
-    return redirect('post_detail', pk=pk)
+        post.likes.add(request.user)  # Like
+        liked = True
+
+    return JsonResponse({
+        'liked': liked,
+        'like_count': post.likes.count(),
+    })
 
 def new_user(request):
     if request.method == 'POST':

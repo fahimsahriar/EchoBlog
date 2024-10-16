@@ -25,12 +25,13 @@
             <!-- Like and Comment Section -->
             <div class="mb-4">
                 <!-- Likes -->
-                <form method="POST" action="{% url 'like_post' post.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-primary">
+                <button id="like-button" class="btn btn-outline-primary" data-post-id="{{ post.id }}">
+                    {% if user in post.likes.all %}
+                        Unlike ({{ post.likes.count }})
+                    {% else %}
                         Like ({{ post.likes.count }})
-                    </button>
-                </form>
+                    {% endif %}
+                </button>
             </div>
 
             <!-- Comment Section -->
@@ -63,4 +64,35 @@
         </div>
     </div>
 </div>
+
+<!-- Add jQuery (ensure it's included if you don't have it already) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#like-button').click(function() {
+            var postId = $(this).data('post-id');
+            var button = $(this);
+
+            $.ajax({
+                url: "{% url 'like_post' post.id %}",
+                type: "POST",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    // Update like count and button text based on response
+                    if (data.liked) {
+                        button.text('Unlike (' + data.like_count + ')');
+                    } else {
+                        button.text('Like (' + data.like_count + ')');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while liking the post.');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
