@@ -1,0 +1,16 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}
+    Blog Posts
+{% endblock %}
+
+{% block content %}
+    <h1>All Blog Posts</h1>
+    <ul class="list-group">
+        {% for post in posts %}
+        <li class="list-group-item">
+            <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a> by {{ post.author }}
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

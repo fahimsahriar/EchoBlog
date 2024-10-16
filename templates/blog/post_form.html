@@ -1,0 +1,18 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}
+    New Posts
+{% endblock %}
+
+{% block content %}
+    <h1>New Posts</h1>
+    <form action="" method="post">
+        <table class="table">
+            {{ form.as_table }}
+        </table>
+        <div class="mt-4">
+            {% csrf_token %}
+            <input type="submit" formnovalidate="formnovalidate" value="Add Post" class="btn btn-success" />
+        </div>
+    </form>
+{% endblock %}

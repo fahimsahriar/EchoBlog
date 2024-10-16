@@ -1,0 +1,15 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}
+    Welcome to My Blog
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron text-center mt-4">
+        <h1 class="display-4">Welcome to My Blog!</h1>
+        <p class="lead">This is a simple blog website where you can read, create, and engage with posts.</p>
+        <hr class="my-4">
+        <p>Start exploring by checking out the latest posts, or create your own!</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'create_post' %}" role="button">Create a New Post</a>
+    </div>
+{% endblock %}
