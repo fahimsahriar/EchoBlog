@@ -1,6 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import Post
+from .models import Post, Comment
 from .forms import PostForm, SignUpForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -78,6 +78,20 @@ def like_post(request, post_id):
         'liked': liked,
         'like_count': post.likes.count(),
     })
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == "POST":
+        content = request.POST.get('content')
+        if content:
+            comment = Comment.objects.create(post=post, author=request.user, content=content)
+            return JsonResponse({
+                'author': comment.author.username,
+                'content': comment.content,
+                'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            })
+    return JsonResponse({'error': 'Comment could not be added.'}, status=400)
 
 def new_user(request):
     if request.method == 'POST':
