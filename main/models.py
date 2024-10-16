@@ -13,7 +13,7 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    categories = models.ManyToManyField(Category)
+    categories = models.ManyToManyField('Category')
     likes = models.ManyToManyField(User, related_name='post_likes', blank=True)
 
     def __str__(self):

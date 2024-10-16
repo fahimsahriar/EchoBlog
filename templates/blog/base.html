@@ -9,11 +9,26 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-
     <!-- Additional styles can be added here -->
     <style>
+        /* Ensure that the footer sticks to the bottom of the page when there is not enough content */
+        html, body {
+            height: 100%;
+        }
+
         body {
+            display: flex;
+            flex-direction: column;
             padding-top: 56px;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        footer {
+            background-color: #343a40;
+            color: white;
         }
     </style>
 </head>
@@ -31,19 +46,22 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="">Create Post</a>
-                    </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="">Logout</a>
+                        <a class="nav-link" href="{% url 'create_post' %}">Create Post</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'post_list' %}">All posts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_logout' %}">Logout</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="">Login</a>
+                        <a class="nav-link" href="{% url 'user_login' %}">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="">Sign Up</a>
+                        <a class="nav-link" href="{% url 'new_user' %}">Register</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -52,7 +70,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container">
+    <main class="container">
         <div class="row">
             <div class="col-12">
                 {% block content %}
@@ -60,10 +78,10 @@
                 {% endblock %}
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3 mt-4">
+    <footer class="text-center py-3">
         <p>&copy; 2024 My Blog</p>
     </footer>
 

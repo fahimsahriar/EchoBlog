@@ -1,0 +1,19 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Register</h2>
+
+  <form action="" method="post">
+    <table class="table">
+      {{ form.as_table }}
+    </table>
+    <div class="mt-4">
+      {% csrf_token %}
+      <input type="submit" formnovalidate="formnovalidate" value="Add Record" class="btn btn-success" />
+    </div>
+  </form>
+</div>
+{% endblock %}

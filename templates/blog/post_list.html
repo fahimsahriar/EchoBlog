@@ -1,0 +1,57 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}All Posts{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Blog Posts</h1>
+    
+    <div class="list-group">
+        {% for post in posts %}
+            <div class="list-group-item">
+                <!-- Post Title and Link to Detail View -->
+                <h3>
+                    <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                </h3>
+                
+                <!-- Post Excerpt or First 100 Characters -->
+                <p>{{ post.content|truncatechars:100 }}</p>
+                
+                <!-- Categories -->
+                <div>
+                    <strong>Categories:</strong>
+                    {% for category in post.categories.all %}
+                        <span class="badge bg-primary">{{ category.name }}</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Post Meta -->
+                <small class="text-muted">
+                    Posted on {{ post.created_at|date:"F j, Y" }} 
+                </small>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination (if using CBV with paginate_by) -->
+    <div class="pagination mt-4">
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                {% endif %}
+                
+                {% for page_num in paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

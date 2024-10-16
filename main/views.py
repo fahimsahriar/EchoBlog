@@ -1,15 +1,20 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Post
-from .forms import PostForm
+from .forms import PostForm, SignUpForm
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 
 # Create your views here.
 def index(request):
     return render(request, 'blog/home.html')
 
+def post_list(request):
+    posts = Post.objects.order_by('-created_at')  # Get all posts, ordered by newest
+    return render(request, 'blog/post_list.html', {'posts': posts})
 
-#@login_required
+@login_required
 def post_detail(request, pk):
     # Get the post by primary key (pk)
     post = get_object_or_404(Post, pk=pk)
@@ -50,3 +55,35 @@ def like_post(request, pk):
     else:
         post.likes.add(request.user)
     return redirect('post_detail', pk=pk)
+
+def new_user(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+
+            login(request, user)
+            return redirect('index')
+    else:   
+        form = SignUpForm()
+    return render(request, 'blog/register.html', {'form': form})
+
+def user_login(request):
+    TemplateFile = "blog/login.html"
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('index')  # Redirect to homepage after login
+    else:
+        form = AuthenticationForm()
+    return render(request, TemplateFile, {'form': form})
+
+#logout function
+def user_logout(request):
+    logout(request)
+    return redirect('user_login')  # Redirect to homepage after logout
