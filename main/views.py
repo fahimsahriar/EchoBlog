@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Post, Comment
 from .forms import PostForm, SignUpForm
@@ -69,6 +69,37 @@ def create_post(request):
     return render(request, 'blog/post_form.html', {'form': form})
 
 @login_required
+def edit_post(request, post_id):
+    post = Post.objects.get(id = post_id)
+    # Check if the logged-in user is the author of the post
+    if post.author != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this post.")
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            print("Hi")
+            print(post.author)
+            post.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/post_edit.html', {'form': form})
+
+#Delete Post
+@login_required
+def delete_post(request, post_id):
+    post = Post.objects.get(id = post_id)
+    # Check if the logged-in user is the author of the post
+    if post.author != request.user:
+        return HttpResponseForbidden("You are not allowed to delete this post.")
+    if request.method == 'POST':
+        post.delete()
+        return redirect("index")
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/post_delete.html', {'post': post})
+
+@login_required
 def like_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
@@ -85,7 +116,7 @@ def like_post(request, post_id):
         'like_count': post.likes.count(),
     })
 
-
+#User registration
 def new_user(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -98,6 +129,7 @@ def new_user(request):
         form = SignUpForm()
     return render(request, 'blog/register.html', {'form': form})
 
+#Custom user login
 def user_login(request):
     TemplateFile = "blog/login.html"
     if request.method == "POST":
@@ -119,6 +151,7 @@ def user_logout(request):
     return redirect('user_login')  # Redirect to homepage after logout
 
 #User profile view
+@login_required
 def user_profile(request, username):
     # Get the user by username
     user = get_object_or_404(User, username=username)

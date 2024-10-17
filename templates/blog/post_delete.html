@@ -1,0 +1,44 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <!-- Post Title -->
+            <h1 class="mt-4">{{ post.title }}</h1>
+
+            <p class="card-text">
+                {{ post.content|truncatechars:300 }}
+            </p>
+
+            <!-- Post Meta (Categories) -->
+            <div class="mb-3">
+                <strong>Categories:</strong>
+                {% for category in post.categories.all %}
+                    <span class="badge bg-primary">{{ category.name }}</span>
+                {% endfor %}
+            </div>
+            <!-- Like and Comment Section -->
+            <div class="mb-4">
+                <!-- Likes -->
+                <button id="like-button" class="btn btn-outline-primary" data-post-id="{{ post.id }}">
+                    {% if user in post.likes.all %}
+                        Unlike ({{ post.likes.count }})
+                    {% else %}
+                        Like ({{ post.likes.count }})
+                    {% endif %}
+                </button>
+            </div>
+            <div class="mt-4">
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="submit" value="Delete" class="btn btn-danger" />
+                  <a href="{% url 'index' %}" class="btn btn-secondary">Back to Blog List</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

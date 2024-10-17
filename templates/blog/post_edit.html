@@ -1,18 +1,18 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    Add post
+    Edit Post
 {% endblock %}
 
 {% block content %}
-    <h1>Publish a new posts</h1>
+    <h1>Edit Post</h1>
     <form action="" method="post">
         <table class="table">
             {{ form.as_table }}
         </table>
         <div class="mt-4">
             {% csrf_token %}
-            <input type="submit" formnovalidate="formnovalidate" value="Add Post" class="btn btn-success" />
+            <input type="submit" formnovalidate="formnovalidate" value="Edit Post" class="btn btn-success" />
         </div>
     </form>
 {% endblock %}

@@ -43,8 +43,8 @@
                                         <i class="bi bi-three-dots"></i> <!-- Three-dot icon -->
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ post.id }}">
-                                        <li><a class="dropdown-item" href="#">Edit</a></li>
-                                        <li><a class="dropdown-item" href="#">Delete</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'edit_post' post.id %}">Edit</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'delete_post' post.id %}">Delete</a></li>
                                     </ul>
                                 </div>
                             {% endif %}
