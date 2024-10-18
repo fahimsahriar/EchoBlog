@@ -1,0 +1,45 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Search Results for "{{ query }}"</h2>
+
+    {% if posts %}
+        <ul class="list-group">
+            {% for post in posts %}
+                <li class="list-group-item">
+                    <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                    <p>By {{ post.author.username }} | Categories: 
+                        {% for category in post.categories.all %}
+                            <span class="badge bg-primary">{{ category.name }}</span>
+                        {% endfor %}
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Pagination -->
+        <div class="pagination mt-4">
+            <span class="step-links">
+                {% if posts.has_previous %}
+                    <a href="?q={{ query }}&page=1">&laquo; first</a>
+                    <a href="?q={{ query }}&page={{ posts.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+                </span>
+
+                {% if posts.has_next %}
+                    <a href="?q={{ query }}&page={{ posts.next_page_number }}">next</a>
+                    <a href="?q={{ query }}&page={{ posts.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+</div>
+{% endblock %}
