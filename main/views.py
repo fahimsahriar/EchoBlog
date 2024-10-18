@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import Post, Comment
+from .models import Category, Post, Comment
 from .forms import PostForm, SignUpForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -11,22 +11,46 @@ from django.db.models import Q
 
 # Create your views here.
 def index(request):
-    posts = Post.objects.order_by('-created_at')  # Get all posts, ordered by newest
+    posts = Post.objects.order_by('-created_at')  # Default query for posts
 
-    paginator = Paginator(posts, 6)  # Show 25 contacts per page.
-    page_number = request.GET.get("page")
+
+    paginator = Paginator(posts, 6)  # Paginate posts
+    page_number = request.GET.get('page')
     posts_obj = paginator.get_page(page_number)
-
-    return render(request, 'blog/home.html', {'posts': posts_obj})
+    
+    return render(request, 'blog/home.html', {
+        'posts': posts_obj,
+    })
 
 @login_required
 def post_list(request):
-    posts = Post.objects.order_by('-created_at')  # Get all posts, ordered by newest
+    posts = Post.objects.order_by('-created_at')  # Default query for posts
+    categories = Category.objects.all()  # For displaying categories in the filter
 
-    paginator = Paginator(posts, 5)  # Show 25 contacts per page.
-    page_number = request.GET.get("page")
+    # Fetch query parameters for filtering
+    search_query = request.GET.get('q')
+    category_filter = request.GET.get('category')
+
+    # Filter posts based on search query, category, and author
+    if search_query:
+        posts = posts.filter(
+            Q(title__icontains=search_query) | 
+            Q(author__username__icontains=search_query) |  # Search by author username
+            Q(content__icontains=search_query)
+        )
+    
+    if category_filter:
+        posts = posts.filter(categories__id=category_filter)
+
+
+    paginator = Paginator(posts, 6)  # Paginate posts
+    page_number = request.GET.get('page')
     posts_obj = paginator.get_page(page_number)
-    return render(request, 'blog/post_list.html', {'posts': posts_obj})
+    
+    return render(request, 'blog/post_list.html', {
+        'posts': posts_obj,
+        'categories': categories,
+    })
 
 @login_required
 def post_detail(request, pk):

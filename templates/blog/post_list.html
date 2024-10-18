@@ -5,39 +5,58 @@
 {% block content %}
 <div class="container">
     <h1 class="mt-4 mb-4 text-center">Blog Posts</h1>
-    
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            {% for post in posts %}
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body">
-                    <!-- Post Title and Link to Detail View -->
-                    <h3 class="card-title">
-                        <a href="{% url 'post_detail' post.id %}" class="text-dark text-decoration-none">
-                            {{ post.title }}
-                        </a>
-                    </h3>
 
-                    <!-- Post Excerpt -->
-                    <p class="card-text">{{ post.content|truncatechars:100 }}</p>
-
-                    <!-- Categories -->
-                    <div class="mb-2">
-                        <strong>Categories:</strong>
-                        {% for category in post.categories.all %}
-                            <span class="badge bg-primary">{{ category.name }}</span>
-                        {% endfor %}
-                    </div>
-
-                    <!-- Post Meta (Author and Date) -->
-                    <small class="text-muted">
-                        Published by {{ post.author.username }} on {{ post.created_at|date:"F j, Y" }}
-                    </small>
-                </div>
+    <!-- Filter Form -->
+    <div class="mb-4">
+        <form method="GET" class="row g-2">
+            <div class="col-md-5">
+                <input type="text" name="q" class="form-control" placeholder="Search by keyword..." value="{{ request.GET.q }}">
             </div>
-            {% endfor %}
+
+            <div class="col-md-4">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3 d-grid">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Post List -->
+    {% for post in posts %}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <!-- Post Title and Link to Detail View -->
+            <h3 class="card-title">
+                <a href="{% url 'post_detail' post.id %}" class="text-dark text-decoration-none">
+                    {{ post.title }}
+                </a>
+            </h3>
+
+            <!-- Post Excerpt -->
+            <p class="card-text">{{ post.content|truncatechars:100 }}</p>
+
+            <!-- Categories -->
+            <div class="mb-2">
+                <strong>Categories:</strong>
+                {% for category in post.categories.all %}
+                    <span class="badge bg-primary">{{ category.name }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Post Meta (Author and Date) -->
+            <small class="text-muted">
+                Published by <a href="{% url 'user_profile' post.author.id %}">{{ post.author.username }}</a> on {{ post.created_at|date:"F j, Y" }}
+            </small>
         </div>
     </div>
+    {% endfor %}
 
     <!-- Pagination -->
     <div class="d-flex justify-content-center">
