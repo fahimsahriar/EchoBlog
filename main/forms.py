@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django import forms
 from .models import Post, Category
 from django.contrib.auth.forms import UserCreationForm
@@ -23,3 +24,25 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email']
+
+
+class ProfileUpdateForm(forms.ModelForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        required=True,
+        label="Enter your password to confirm changes"
+    )
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ProfileUpdateForm, self).__init__(*args, **kwargs)
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if not self.user.check_password(password):
+            raise forms.ValidationError("Password is not correct.")
+        return password

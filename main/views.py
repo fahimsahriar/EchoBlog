@@ -8,6 +8,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.contrib import messages
+from .forms import ProfileUpdateForm
 
 # Create your views here.
 def index(request):
@@ -195,6 +197,24 @@ def user_profile(request, username):
     }
 
     return render(request, 'blog/user_profile.html', context)
+
+@login_required
+def update_profile(request):
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, instance=request.user, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile was successfully updated.")
+            return redirect('user_profile', username=request.user.username)
+        else:
+            if form.errors.get("password"):
+                messages.error(request, "Password is not correct.")
+            else:
+                messages.error(request, "Please correct the errors below.")
+    else:
+        form = ProfileUpdateForm(instance=request.user, user=request.user)
+
+    return render(request, 'blog/update_profile.html', {'form': form})
 
 def search_posts(request):
     query = request.GET.get('q')
