@@ -16,7 +16,7 @@
             
             {% if user == user_profile %}
                 <!-- If logged-in user is the profile owner, show these options -->
-                <a href="#" class="btn btn-warning">Change Password</a>
+                <a href="{% url 'change_password' %}" class="btn btn-warning">Change Password</a>
                 <a href="{% url 'update_profile' %}" class="btn btn-primary">Update Profile</a>
             {% endif %}
         </div>

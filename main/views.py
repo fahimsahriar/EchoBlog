@@ -5,11 +5,13 @@ from .forms import PostForm, SignUpForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib import messages
 from .forms import ProfileUpdateForm
+from django.contrib.auth import update_session_auth_hash
 
 # Create your views here.
 def index(request):
@@ -215,6 +217,22 @@ def update_profile(request):
         form = ProfileUpdateForm(instance=request.user, user=request.user)
 
     return render(request, 'blog/update_profile.html', {'form': form})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Keeps the user logged in
+            messages.success(request, "Your password has been updated successfully!")
+            return redirect('user_profile', username=request.user.username)
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    return render(request, 'blog/change_password.html', {'form': form})
 
 def search_posts(request):
     query = request.GET.get('q')
